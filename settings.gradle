@@ -1,0 +1,2 @@
+include ':app', ':library', ':xutils', ':viewpagerindicator'
+project(':library').projectDir = new File('slidingmenu')
