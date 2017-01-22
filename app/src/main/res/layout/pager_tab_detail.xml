@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ListView
+    <com.linsaya.heima_zhbj_01.view.PullToRefreshListView
         android:cacheColorHint="#fff"
         android:id="@+id/lv_news_detail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent"></com.linsaya.heima_zhbj_01.view.PullToRefreshListView>
 
 
 </LinearLayout>
