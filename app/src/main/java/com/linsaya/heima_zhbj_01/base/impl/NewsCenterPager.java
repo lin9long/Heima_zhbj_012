@@ -108,7 +108,8 @@ public class NewsCenterPager extends BasePager {
         //需要在构造方法内传入参数，使菜单详情页能获取网络数据
         pages.add(new NewsMenuDetailPager(mActivity,mData.data.get(0).children));
         pages.add(new TopicMenuDetailPager(mActivity));
-        pages.add(new PhotosMenuDetailPager(mActivity));
+        //此处将按钮作为参数传入构造方法内，因为NewsCenterPager继承自basepager，可以直接使用内部控件
+        pages.add(new PhotosMenuDetailPager(mActivity,ib_photo_list));
         pages.add(new InteractMenuDetailPager(mActivity));
         //初始化布局
         setCurrentDetailPager(0);
@@ -124,6 +125,13 @@ public class NewsCenterPager extends BasePager {
         flContent.addView(baseMenuDetailPager.mRootView);
         baseMenuDetailPager.initData();
         tvTitle.setText(mData.data.get(position).title);
+
+        //此处判断，当前页面是否为PhotosMenuDetailPager页面，如果是则显示切换按钮
+        if (baseMenuDetailPager instanceof PhotosMenuDetailPager){
+            ib_photo_list.setVisibility(View.VISIBLE);
+        }else {
+            ib_photo_list.setVisibility(View.GONE);
+        }
 
     }
 }

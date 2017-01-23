@@ -45,12 +45,12 @@ public class NewsMenuDetailPager extends BaseMenuDetailPager implements ViewPage
     @Override
     public View initView() {
 
-            TextView textView = new TextView(mActivity);
-            textView.setText("菜单详情页：新闻");
-            textView.setTextColor(Color.RED);
-            textView.setTextSize(30);
-            textView.setGravity(Gravity.CENTER);
-          //  return textView;
+//            TextView textView = new TextView(mActivity);
+//            textView.setText("菜单详情页：新闻");
+//            textView.setTextColor(Color.RED);
+//            textView.setTextSize(30);
+//            textView.setGravity(Gravity.CENTER);
+//            return textView;
 
         View view = View.inflate(mActivity,R.layout.pager_news_menu_detail,null);
         vp_news_menu_detail = (ViewPager) view.findViewById(R.id.vp_news_menu_detail);

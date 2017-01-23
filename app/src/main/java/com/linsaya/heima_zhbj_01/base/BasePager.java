@@ -21,6 +21,7 @@ public class BasePager {
     public FrameLayout flContent;
     public ImageButton ibMenu;
     public TextView tvTitle;
+    public ImageButton ib_photo_list;
 
 
     public BasePager(Activity activity) {
@@ -34,6 +35,8 @@ public class BasePager {
         flContent = (FrameLayout) view.findViewById(R.id.fl_content);
         ibMenu = (ImageButton) view.findViewById(R.id.ib_menu);
         tvTitle = (TextView) view.findViewById(R.id.tv_title);
+        //此处查找id，因为标题布局加载到basepager中
+        ib_photo_list = (ImageButton) view.findViewById(R.id.ib_photo_list);
         ibMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

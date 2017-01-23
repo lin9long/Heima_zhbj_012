@@ -3,9 +3,12 @@ package com.linsaya.heima_zhbj_01.base.impl.menu;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -52,6 +55,7 @@ public class TabDetailPager extends BaseMenuDetailPager {
     private List<NewsTabBean.NewsData> mListNews;
     private ListViewAdapter mNewsListAdapter;
     private String mMoreUrl;
+    private Handler mHandler;
 
     public TabDetailPager(Activity activity, NewsMenu.NewsTabData newsTabData) {
         super(activity);
@@ -90,7 +94,7 @@ public class TabDetailPager extends BaseMenuDetailPager {
                 }
             }
         });
-        //处理点击事件
+        //处理新闻详情页的点击事件
         lv_news_detail.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -111,8 +115,10 @@ public class TabDetailPager extends BaseMenuDetailPager {
                 }
                 TextView tv_title = (TextView) view.findViewById(R.id.tv_title);
                 tv_title.setTextColor(Color.GRAY);
-                //开启一个新的activity
+                //开启一个新的activity，打开webview显示网页
                 Intent intent = new Intent(mActivity, NewsDetailActivity.class);
+                //将网页链接传入intent内
+                intent.putExtra("url", mListNews.get(position).url);
                 mActivity.startActivity(intent);
             }
         });
@@ -198,7 +204,7 @@ public class TabDetailPager extends BaseMenuDetailPager {
         });
     }
 
-    //解析数据包
+    //解析数据包，boolean变量判断是否加载更多
     private void processData(String json, boolean isLoadMore) {
         Gson gson = new Gson();
         NewsTabBean newsTabBean = gson.fromJson(json, NewsTabBean.class);
@@ -255,9 +261,48 @@ public class TabDetailPager extends BaseMenuDetailPager {
             List<NewsTabBean.NewsData> news = newsTabBean.data.news;
             mListNews.addAll(news);
             mNewsListAdapter.notifyDataSetChanged();
-
         }
-
+        //实现topnews的viewpager自动轮播
+        if (mHandler == null) {
+            mHandler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    int currentItem = vp_paper_tab_detail.getCurrentItem();
+                    currentItem++;
+                    if (currentItem > mTopnews.size() - 1) {
+                        currentItem = 0;
+                    }
+                    vp_paper_tab_detail.setCurrentItem(currentItem);
+                    mHandler.sendEmptyMessageDelayed(0, 3000);
+                }
+            };
+        }
+        //只发送一次msg的数据，如果在开始设置则会发送多次
+        mHandler.sendEmptyMessageDelayed(0, 3000);
+        //重写触摸监听事件，改善用户体验
+        vp_paper_tab_detail.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        //当用户按下时，取消所有的msg发送
+                        mHandler.removeCallbacksAndMessages(null);
+                        System.out.println("ACTION_DOWN");
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        //当用户抬手时，恢复消息发送
+                        mHandler.sendEmptyMessageDelayed(0, 3000);
+                        System.out.println("ACTION_UP");
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        //当用户按下时，没有在原地抬手，而是触摸listview或是滑动到布局的其他地方，执行此方法，不再执行ACTION_UP
+                        mHandler.sendEmptyMessageDelayed(0, 3000);
+                        System.out.println("ACTION_CANCEL");
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
     class MyAdapter extends PagerAdapter {

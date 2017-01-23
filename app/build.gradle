@@ -30,4 +30,5 @@ dependencies {
     compile project(':xutils')
     compile files('libs/gson-2.3.1.jar')
     compile project(':viewpagerindicator')
+    compile files('libs/MobTools-2016.1222.1756.jar')
 }
