@@ -148,6 +148,7 @@ public class PhotosMenuDetailPager extends BaseMenuDetailPager implements View.O
             String title = mNewsList.get(position).title;
             viewholder.tv_title.setText(title);
             String photoUrl = mNewsList.get(position).listimage;
+            //自定义三级缓存工具
             MyBitmapUtils mBitmapUtils = new MyBitmapUtils();
             mBitmapUtils.display(viewholder.iv_photo,photoUrl);
             //x.image().bind(viewholder.iv_photo, photoUrl);

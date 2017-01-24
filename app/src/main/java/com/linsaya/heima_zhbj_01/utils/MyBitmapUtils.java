@@ -10,13 +10,14 @@ import android.widget.ImageView;
 
 public class MyBitmapUtils {
 
-    private final NetCacheUtils mNetCacheUtils;
-    private final LocalCacheUtils mLocalCacheUtils;
+    private NetCacheUtils mNetCacheUtils;
+    private LocalCacheUtils mLocalCacheUtils;
+    private MemoryCacheUtils mMemoryCacheUtils;
 
     public MyBitmapUtils() {
+        mMemoryCacheUtils = new MemoryCacheUtils();
         mLocalCacheUtils = new LocalCacheUtils();
-        mNetCacheUtils = new NetCacheUtils(mLocalCacheUtils);
-
+        mNetCacheUtils = new NetCacheUtils(mLocalCacheUtils, mMemoryCacheUtils);
     }
 
 
@@ -28,11 +29,19 @@ public class MyBitmapUtils {
      */
     public void display(ImageView iv_photo, String photoUrl) {
 
+        Bitmap bitmap = mMemoryCacheUtils.getMemoryCache(photoUrl);
+        if (bitmap != null) {
+            iv_photo.setImageBitmap(bitmap);
+            System.out.println("发现内存缓存啦");
+            return;
+        }
         //获取本地缓存数据
-        Bitmap localCache = mLocalCacheUtils.getLocalCache(photoUrl);
+        bitmap = mLocalCacheUtils.getLocalCache(photoUrl);
         //如果本地缓存数据存在，直接加载数据
-        if (localCache!=null){
-            iv_photo.setImageBitmap(localCache);
+        if (bitmap != null) {
+            iv_photo.setImageBitmap(bitmap);
+            //当不从网络获取图片时，讲本地图片写入内存缓存
+            mMemoryCacheUtils.setMemoryCache(photoUrl, bitmap);
             System.out.println("读取本地缓存啦");
             return;
         }

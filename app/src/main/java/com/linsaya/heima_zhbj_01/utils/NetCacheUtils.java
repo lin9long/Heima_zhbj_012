@@ -21,9 +21,11 @@ public class NetCacheUtils {
     private ImageView mImageView;
     private String mUrl;
     private LocalCacheUtils mLocalCacheUtils;
+    private MemoryCacheUtils mMemoryCacheUtils;
 
-    public NetCacheUtils(LocalCacheUtils LocalCacheUtils) {
+    public NetCacheUtils(LocalCacheUtils LocalCacheUtils, MemoryCacheUtils MemoryCacheUtils) {
         mLocalCacheUtils = LocalCacheUtils;
+        mMemoryCacheUtils = MemoryCacheUtils;
     }
 
     public void getBitmapFromNet(ImageView iv_photo, String photoUrl) {
@@ -48,7 +50,8 @@ public class NetCacheUtils {
 
             try {
                 bitmap = downLoadBitmap(mUrl);
-                mLocalCacheUtils.setLocahCache(mUrl,bitmap);
+
+
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -58,9 +61,8 @@ public class NetCacheUtils {
         //异步任务执行前参数处理
         @Override
         protected void onPreExecute() {
-            mImageView.setTag(mUrl);
             super.onPreExecute();
-
+            mImageView.setTag(mUrl);
         }
 
 
@@ -71,39 +73,43 @@ public class NetCacheUtils {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
+
             //先进行非空判断后，再复制
             if (bitmap != null) {
                 String tag = (String) mImageView.getTag();
                 if (tag.equals(mUrl)) {//因为listview存在复用机制
                     // 判断当前图片是否为当前所加载url的图片，如果是，说明图片正确
                     mImageView.setImageBitmap(bitmap);
+                    //设置本地图片缓存
+                    mLocalCacheUtils.setLocahCache(tag, bitmap);
+                    //设置内存图片缓存
+                    mMemoryCacheUtils.setMemoryCache(tag, bitmap);
                 }
             }
-
+            super.onPostExecute(bitmap);
         }
+    }
 
-        private Bitmap downLoadBitmap(String url) throws MalformedURLException {
-            URL mUrl = new URL(url);
-            HttpURLConnection connection = null;
-            try {
-                connection = (HttpURLConnection) mUrl.openConnection();
-                connection.setReadTimeout(5000);
-                connection.setConnectTimeout(2000);
-                int responseCode = connection.getResponseCode();
-                if (responseCode == 200) {
-                    InputStream is = connection.getInputStream();
-                    Bitmap bitmap = BitmapFactory.decodeStream(is);
-                    return bitmap;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
+    private Bitmap downLoadBitmap(String url) throws MalformedURLException {
+        URL mUrl = new URL(url);
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) mUrl.openConnection();
+            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(2000);
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                InputStream is = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(is);
+                return bitmap;
             }
-            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
+        return null;
     }
 }
